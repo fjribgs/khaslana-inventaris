@@ -153,7 +153,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
                 if (dbPassword.equals(password)) {
                     JOptionPane.showMessageDialog(null, "Login berhasil!");
-//                    new MainMenu().setVisible(true);
+                    new MainMenu().setVisible(true);
                     this.dispose();
                 } else {
                     JOptionPane.showMessageDialog(null, "Password salah");
