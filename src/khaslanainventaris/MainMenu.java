@@ -300,7 +300,10 @@ public class MainMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_addCategoryActionPerformed
 
     private void deleteCategoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteCategoryActionPerformed
-        // TODO add your handling code here:
+        DeleteCategoryDialog dialog = new DeleteCategoryDialog(this, this, true);
+
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }//GEN-LAST:event_deleteCategoryActionPerformed
 
     /**

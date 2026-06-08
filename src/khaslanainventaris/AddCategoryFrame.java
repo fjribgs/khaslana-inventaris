@@ -206,12 +206,34 @@ public class AddCategoryFrame extends javax.swing.JFrame {
         }
         
         try {
-            Statement st = dbConn.conn.createStatement();
-            st.executeUpdate("INSERT INTO categories (id, name) values (null, '" + name + "')");
+            String checkQuery = "SELECT COUNT(*) FROM categories WHERE name = ?";
             
-            JOptionPane.showMessageDialog(null, "Kategori " + name + " Berhasil Ditambahkan!!!");
-             parent.refreshData();
-            this.dispose();
+            PreparedStatement checkPs = dbConn.conn.prepareStatement(checkQuery);
+            checkPs.setString(1, name);
+            ResultSet rs = checkPs.executeQuery();
+
+            if (rs.next() && rs.getInt(1) > 0) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Kategori \"" + name + "\" sudah ada!"
+                );
+                return;
+            }
+            
+            String insertQuery = "INSERT INTO categories (id, name) VALUES (NULL, ?)";
+            PreparedStatement insertPs = dbConn.conn.prepareStatement(insertQuery);
+
+            insertPs.setString(1, name);
+            insertPs.executeUpdate();
+
+            JOptionPane.showMessageDialog(
+                this,
+                "Kategori " + name + " berhasil ditambahkan!"
+            );
+
+            parent.refreshData();
+            loadDataTable();
+            nameField.setText("");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
                 this,
