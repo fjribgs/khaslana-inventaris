@@ -201,7 +201,7 @@ public class AddCategoryFrame extends javax.swing.JFrame {
         String name = nameField.getText().trim();
         
         if (name.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Judul buku tidak boleh kosong!");
+            JOptionPane.showMessageDialog(null, "Nama Kategori tidak boleh kosong!");
             return;
         }
         

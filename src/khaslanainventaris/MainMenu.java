@@ -135,6 +135,7 @@ public class MainMenu extends javax.swing.JFrame {
         deleteCategory = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel1.setFont(new java.awt.Font("Google Sans", 1, 36)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(153, 255, 51));
@@ -216,6 +217,11 @@ public class MainMenu extends javax.swing.JFrame {
         editBtn.setForeground(new java.awt.Color(255, 255, 255));
         editBtn.setText("Edit Barang");
         editBtn.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 255, 51), 1, true));
+        editBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                editBtnMouseClicked(evt);
+            }
+        });
         editBtn.addActionListener(this::editBtnActionPerformed);
 
         deleteBtn.setBackground(new java.awt.Color(30, 27, 38));
@@ -321,6 +327,17 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
         // TODO add your handling code here:
+        int selectedRow = dataTable.getSelectedRow();
+        
+        if (selectedRow != -1) {
+            int itemId = (int) dataTable.getValueAt(selectedRow, 0);
+                    
+            EditItemDialog dialog = new EditItemDialog (this,true, itemId);
+            dialog.setLocationRelativeTo(this);
+            dialog.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih barang yang ingin diedit terlebih dahulu pada tabel!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_editBtnActionPerformed
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
@@ -345,6 +362,10 @@ public class MainMenu extends javax.swing.JFrame {
     private void addBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addBtnMouseClicked
         
     }//GEN-LAST:event_addBtnMouseClicked
+
+    private void editBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_editBtnMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_editBtnMouseClicked
 
     /**
      * @param args the command line arguments
