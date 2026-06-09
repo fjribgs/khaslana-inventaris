@@ -140,6 +140,11 @@ public class LoginFrame extends javax.swing.JFrame {
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         String email = emailField.getText();
         String password = new String(passwordField.getPassword());
+        
+        if (email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username atau Password tidak boleh kosong.");
+            return;
+        }
 
         try {
             String query = "SELECT * FROM users WHERE email=?";
