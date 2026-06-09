@@ -72,6 +72,7 @@ public class AddItemFrame extends javax.swing.JFrame {
      */
     public AddItemFrame(MainMenu parent) {
         initComponents();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setBackground(new Color(30, 27, 38));
         // 🔹 CUSTOM SPINNER
         ((JSpinner.DefaultEditor) jumlahSpinner.getEditor()).getTextField().setBackground(new Color(30, 27, 38));
