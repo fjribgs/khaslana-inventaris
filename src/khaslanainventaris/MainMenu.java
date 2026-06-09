@@ -20,60 +20,78 @@ public class MainMenu extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainMenu.class.getName());
     
-    private void loadDataTable() {
-        try {
-            String query = """
-                SELECT
-                    i.id,
-                    c.name AS category,
-                    i.name,
-                    i.code,
-                    i.jumlah,
-                    i.item_condition,
-                    i.notes,
-                    i.created_at
-                FROM items i
-                LEFT JOIN categories c
-                    ON i.category_id = c.id
-                ORDER BY i.id DESC
-            """;
+    private void loadDataTable(String keyword) {
+       try {
+        String query = """
+            SELECT
+                i.id,
+                c.name AS category,
+                i.name,
+                i.code,
+                i.jumlah,
+                i.item_condition,
+                i.notes,
+                i.created_at
+            FROM items i
+            LEFT JOIN categories c
+                ON i.category_id = c.id
+            WHERE 
+                CAST(i.id AS CHAR) LIKE ? OR
+                i.name LIKE ? OR
+                i.code LIKE ? OR
+                c.name LIKE ? OR
+                i.item_condition LIKE ?
+            ORDER BY i.id ASC
+        """;
 
-            PreparedStatement ps = dbConn.conn.prepareStatement(query);
-            ResultSet rs = ps.executeQuery();
+        PreparedStatement ps = dbConn.conn.prepareStatement(query);
 
-            DefaultTableModel model = new DefaultTableModel();
+        String param = "%" + keyword + "%";
 
-            model.addColumn("ID");
-            model.addColumn("Kategori");
-            model.addColumn("Nama Barang");
-            model.addColumn("Kode");
-            model.addColumn("Jumlah");
-            model.addColumn("Kondisi");
-            model.addColumn("Catatan");
-            model.addColumn("Tanggal Dibuat");
+        ps.setString(1, param); // ID
+        ps.setString(2, param); // name
+        ps.setString(3, param); // code
+        ps.setString(4, param); // kategori
+        ps.setString(5, param); // kondisi
 
-            while (rs.next()) {
-                model.addRow(new Object[]{
-                    rs.getInt("id"),
-                    rs.getString("category"),
-                    rs.getString("name"),
-                    rs.getString("code"),
-                    rs.getInt("jumlah"),
-                    rs.getString("item_condition"),
-                    rs.getString("notes"),
-                    rs.getTimestamp("created_at")
-                });
-            }
-            dataTable.setModel(model);
+        ResultSet rs = ps.executeQuery();
 
-            rs.close();
-            ps.close();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Gagal memuat data\n" + e.getMessage()
-            );
+        DefaultTableModel model = new DefaultTableModel();
+
+        model.addColumn("ID");
+        model.addColumn("Kategori");
+        model.addColumn("Nama Barang");
+        model.addColumn("Kode");
+        model.addColumn("Jumlah");
+        model.addColumn("Kondisi");
+        model.addColumn("Catatan");
+        model.addColumn("Tanggal Dibuat");
+
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                rs.getInt("id"),
+                rs.getString("category"),
+                rs.getString("name"),
+                rs.getString("code"),
+                rs.getInt("jumlah"),
+                rs.getString("item_condition"),
+                rs.getString("notes"),
+                rs.getTimestamp("created_at")
+            });
         }
+
+        dataTable.setModel(model);
+
+        rs.close();
+        ps.close();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal search\n" + e.getMessage());
+        }
+    }
+    
+    private void loadDataTable() {
+        loadDataTable("");
     }
     
     public void refreshData() {
@@ -89,6 +107,8 @@ public class MainMenu extends javax.swing.JFrame {
         getContentPane().setBackground(new Color(30, 27, 38));
         dbConn = new connection();
         loadDataTable();
+        searchField.setCaretColor(Color.WHITE);
+        searchField.setSelectionColor(new Color(153, 255, 51));
     }
 
     /**
@@ -185,6 +205,11 @@ public class MainMenu extends javax.swing.JFrame {
         addBtn.setForeground(new java.awt.Color(255, 255, 255));
         addBtn.setText("Tambah Barang");
         addBtn.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 255, 51), 1, true));
+        addBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                addBtnMouseClicked(evt);
+            }
+        });
         addBtn.addActionListener(this::addBtnActionPerformed);
 
         editBtn.setBackground(new java.awt.Color(30, 27, 38));
@@ -253,12 +278,11 @@ public class MainMenu extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(searchBtn)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
                         .addComponent(addBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(editBtn)
@@ -267,8 +291,11 @@ public class MainMenu extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(addCategory)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(deleteCategory)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(deleteCategory)
+                        .addContainerGap(323, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
 
         pack();
@@ -276,14 +303,20 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void searchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchFieldActionPerformed
         // TODO add your handling code here:
+        searchBtnActionPerformed(evt);
     }//GEN-LAST:event_searchFieldActionPerformed
 
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBtnActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here:                                
+        String keyword = searchField.getText().trim();
+        loadDataTable(keyword);
     }//GEN-LAST:event_searchBtnActionPerformed
 
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
         // TODO add your handling code here:
+        AddItemFrame form = new AddItemFrame(this);
+        form.setLocationRelativeTo(this);
+        form.setVisible(true);
     }//GEN-LAST:event_addBtnActionPerformed
 
     private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
@@ -308,6 +341,10 @@ public class MainMenu extends javax.swing.JFrame {
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }//GEN-LAST:event_deleteCategoryActionPerformed
+
+    private void addBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_addBtnMouseClicked
+        
+    }//GEN-LAST:event_addBtnMouseClicked
 
     /**
      * @param args the command line arguments
