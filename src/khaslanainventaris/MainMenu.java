@@ -5,7 +5,6 @@
 package khaslanainventaris;
 
 import java.awt.Color;
-import javax.swing.JFrame;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
@@ -157,6 +156,76 @@ public class MainMenu extends javax.swing.JFrame {
         }
     }
     
+    private void loadCategories() {
+        try {
+            categoryFilter.removeAllItems();
+            categoryFilter.addItem("Semua Kategori");
+
+            String query = "SELECT name FROM categories ORDER BY name";
+            PreparedStatement ps = dbConn.conn.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                categoryFilter.addItem(rs.getString("name"));
+            }
+
+            rs.close();
+            ps.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }
+    
+    private void loadDataByCategory(String category) {
+        try {
+            String query = """
+                SELECT
+                    i.id,
+                    c.name AS category,
+                    i.name,
+                    i.code,
+                    i.jumlah,
+                    i.item_condition,
+                    i.notes,
+                    i.created_at
+                FROM items i
+                LEFT JOIN categories c
+                    ON i.category_id = c.id
+                WHERE c.name = ?
+                ORDER BY i.id ASC
+            """;
+
+            PreparedStatement ps = dbConn.conn.prepareStatement(query);
+            ps.setString(1, category);
+
+            ResultSet rs = ps.executeQuery();
+
+            DefaultTableModel model = (DefaultTableModel) dataTable.getModel();
+            model.setRowCount(0);
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("id"),
+                    rs.getString("category"),
+                    rs.getString("name"),
+                    rs.getString("code"),
+                    rs.getInt("jumlah"),
+                    rs.getString("item_condition"),
+                    rs.getString("notes"),
+                    rs.getTimestamp("created_at")
+                });
+            }
+
+            dataTable.setModel(model);
+
+            rs.close();
+            ps.close();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }
+    
     private void loadDataTable() {
         loadDataTable("");
     }
@@ -182,6 +251,7 @@ public class MainMenu extends javax.swing.JFrame {
         getContentPane().setBackground(new Color(30, 27, 38));
         dbConn = new connection();
         loadDataTable();
+        loadCategories();
         searchField.setCaretColor(Color.WHITE);
         searchField.setSelectionColor(new Color(153, 255, 51));
     }
@@ -208,6 +278,7 @@ public class MainMenu extends javax.swing.JFrame {
         deleteBtn = new javax.swing.JButton();
         addCategory = new javax.swing.JButton();
         deleteCategory = new javax.swing.JButton();
+        categoryFilter = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -317,6 +388,12 @@ public class MainMenu extends javax.swing.JFrame {
         deleteCategory.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 255, 51), 1, true));
         deleteCategory.addActionListener(this::deleteCategoryActionPerformed);
 
+        categoryFilter.setBackground(new java.awt.Color(30, 27, 38));
+        categoryFilter.setForeground(new java.awt.Color(255, 255, 255));
+        categoryFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        categoryFilter.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 255, 51), 1, true));
+        categoryFilter.addActionListener(this::categoryFilterActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -326,16 +403,17 @@ public class MainMenu extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 328, Short.MAX_VALUE)
-                                .addComponent(jLabel1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(searchField)))
+                        .addGap(0, 328, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addGap(159, 159, 159))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(searchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 426, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(searchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(categoryFilter, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -358,7 +436,8 @@ public class MainMenu extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel2)
                         .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(searchBtn)))
+                        .addComponent(searchBtn)
+                        .addComponent(categoryFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -373,7 +452,7 @@ public class MainMenu extends javax.swing.JFrame {
                         .addComponent(addCategory)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(deleteCategory)
-                        .addContainerGap(323, Short.MAX_VALUE))
+                        .addContainerGap(321, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
@@ -442,6 +521,21 @@ public class MainMenu extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_editBtnMouseClicked
 
+    private void categoryFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_categoryFilterActionPerformed
+        Object selected = categoryFilter.getSelectedItem();
+
+        if (selected == null) {
+            return;
+        }
+        String selectedCategory = selected.toString();
+
+        if (selectedCategory.equals("Semua Kategori")) {
+            loadDataTable();
+        } else {
+            loadDataByCategory(selectedCategory);
+        }
+    }//GEN-LAST:event_categoryFilterActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -470,6 +564,7 @@ public class MainMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addBtn;
     private javax.swing.JButton addCategory;
+    private javax.swing.JComboBox<String> categoryFilter;
     private javax.swing.JTable dataTable;
     private javax.swing.JButton deleteBtn;
     private javax.swing.JButton deleteCategory;
