@@ -78,10 +78,12 @@ public class LoginFrame extends javax.swing.JFrame {
 
         emailField.setBackground(new java.awt.Color(30, 27, 38));
         emailField.setForeground(new java.awt.Color(255, 255, 255));
+        emailField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 255, 51), 1, true));
         emailField.setCaretColor(new java.awt.Color(255, 255, 255));
 
         passwordField.setBackground(new java.awt.Color(30, 27, 38));
         passwordField.setForeground(new java.awt.Color(255, 255, 255));
+        passwordField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 255, 51), 1, true));
         passwordField.setCaretColor(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

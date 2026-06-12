@@ -17,8 +17,8 @@ public class connection {
     public connection() {
         String id, password, driver, url;
         
-        id = "ikshan";
-        password = "ikshan123";
+        id = "aizen";
+        password = "aizen.exe";
         driver = "com.mysql.cj.jdbc.Driver";
         url = "jdbc:mysql://localhost:3306/khaslana_inventaris?userTimezone=true&server=UTC";
         

@@ -20,6 +20,73 @@ public class MainMenu extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainMenu.class.getName());
     
+    private void styleTable() {
+        // BODY
+        dataTable.setRowHeight(25);
+        dataTable.setGridColor(new Color(153, 255, 51));
+
+        // HEADER FIX
+        dataTable.getTableHeader().setDefaultRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(
+                    javax.swing.JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+
+                javax.swing.JLabel label = new javax.swing.JLabel(value.toString());
+                label.setOpaque(true);
+                label.setBackground(new Color(153, 255, 51));
+                label.setForeground(new Color(27, 30, 38));
+                label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                label.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+
+                return label;
+            }
+        });
+
+        // BODY RENDERER
+        dataTable.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(
+                    javax.swing.JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+
+                javax.swing.JLabel cell = (javax.swing.JLabel) super.getTableCellRendererComponent(
+                        table, value, isSelected, hasFocus, row, column);
+
+                cell.setBackground(new Color(27, 30, 38));
+                cell.setForeground(Color.WHITE);
+
+                if (isSelected) {
+                    cell.setBackground(new Color(153, 255, 51));
+                    cell.setForeground(new Color(27, 30, 38));
+                }
+
+                return cell;
+            }
+        });
+
+        // FIX AREA KOSONG
+        jScrollPane1.getViewport().setBackground(new Color(27, 30, 38));
+
+        // BORDER
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(153, 255, 51)));
+    }
+    
+    private void styleButton(javax.swing.JButton btn) {
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(true);
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(true);
+
+        btn.setBackground(new Color(27, 30, 38)); // #1b1e26
+        btn.setForeground(Color.WHITE);
+        btn.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(153, 255, 51)));
+
+        btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+    }
+    
+    
+    
     private void loadDataTable(String keyword) {
        try {
         String query = """
@@ -103,7 +170,15 @@ public class MainMenu extends javax.swing.JFrame {
      */
     public MainMenu() {
         initComponents();
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        styleTable();
+        styleButton(addBtn);
+        styleButton(editBtn);
+        styleButton(deleteBtn);
+        styleButton(addCategory);
+        styleButton(deleteCategory);
+        styleButton(searchBtn);
+        //setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(30, 27, 38));
         dbConn = new connection();
         loadDataTable();
