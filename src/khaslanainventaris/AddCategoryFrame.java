@@ -232,6 +232,7 @@ public class AddCategoryFrame extends javax.swing.JFrame {
             );
 
             parent.refreshData();
+            parent.refreshCategoryData();
             loadDataTable();
             nameField.setText("");
         } catch (Exception e) {

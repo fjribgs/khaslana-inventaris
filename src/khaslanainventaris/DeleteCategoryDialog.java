@@ -209,6 +209,7 @@ public class DeleteCategoryDialog extends javax.swing.JDialog {
             if (affectedRows > 0) {
                 JOptionPane.showMessageDialog(this, "Kategori berhasil dihapus!");
                 parent.refreshData();
+                parent.refreshCategoryData();
                 loadDataTable();
                 idNameField.setText(null);
             } else {
