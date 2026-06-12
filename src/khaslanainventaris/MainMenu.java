@@ -233,6 +233,10 @@ public class MainMenu extends javax.swing.JFrame {
     public void refreshData() {
         loadDataTable();
     }
+    
+    public void refreshCategoryData() {
+        loadCategories();
+    }
 
     /**
      * Creates new form MainMenu
